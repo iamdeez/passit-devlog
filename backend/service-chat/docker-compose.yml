@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: service_chat-service
+    environment:
+      DB_HOST: host.docker.internal
+      DB_PORT: 3307
+      DB_NAME: passit_db
+      DB_USER: passit_user
+      DB_PASSWORD: passit_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      TZ: Asia/Seoul
+      JAVA_OPTS: "-Duser.timezone=Asia/Seoul"
+    ports:
+      - "8084:8084"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - passit-network
+
+networks:
+  passit-network:
+    external: true
+    name: passit-network

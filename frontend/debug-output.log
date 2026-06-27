@@ -1,0 +1,50 @@
+
+> frontend@0.1.0 test:e2e
+> playwright test demo-debug.spec.js --headed
+
+
+Running 1 test using 1 worker
+
+[1A[2K[1/1] [chromium] › e2e/demo-debug.spec.js:11:7 › 디버깅 - 티켓 목록 조회 › 티켓 목록 페이지 로드 및 스크린샷
+[1A[2K[chromium] › e2e/demo-debug.spec.js:11:7 › 디버깅 - 티켓 목록 조회 › 티켓 목록 페이지 로드 및 스크린샷
+🔍 디버깅 시작...
+
+[1A[2K1️⃣ API Mock 설정 중...
+
+[1A[2K✅ API Mock 설정 완료
+
+[1A[2K2️⃣ 판매자 인증 중...
+
+[1A[2K✅ 판매자 인증 완료
+
+[1A[2K3️⃣ 홈페이지로 이동 중...
+
+[1A[2K✅ 홈페이지 로드 완료
+
+[1A[2K📸 홈페이지 스크린샷 저장
+
+[1A[2K4️⃣ 티켓 목록 페이지로 이동 중...
+
+[1A[2K❌ 티켓 목록 페이지 로드 실패: page.goto: Timeout 10000ms exceeded.
+Call log:
+[2m  - navigating to "http://localhost:3000/tickets", waiting until "load"[22m
+
+
+[1A[2K📸 에러 스크린샷 저장
+
+[1A[2K
+🎯 디버깅 완료!
+
+[1A[2K📁 스크린샷 파일들:
+
+[1A[2K  - debug-01-home.png
+
+[1A[2K  - debug-02-tickets-loading.png
+
+[1A[2K  - debug-03-tickets-loaded.png
+
+[1A[2K  - debug-04-ticket-detail.png
+
+[1A[2K  - debug-error.png (에러 발생 시)
+
+[1A[2K  1 passed (15.1s)

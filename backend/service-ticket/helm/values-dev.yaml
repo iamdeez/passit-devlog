@@ -1,0 +1,84 @@
+# Override resource names to avoid duplication
+fullnameOverride: ticket-service
+
+replicaCount: 2
+image:
+  repository: ghcr.io/cld4-t2-iamconan/service-ticket
+  pullPolicy: Always
+  tag: "sha-3ba253f"
+imagePullSecrets:
+  - name: ghcr-pull-secret
+serviceAccount:
+  name: ticket-sa
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8082
+monitoring:
+  enabled: true
+  interval: 15s
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/group.name: passit-dev-alb
+    alb.ingress.kubernetes.io/load-balancer-name: passit-dev-alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+  hosts:
+    # host 필드 제거 - Path 기반 라우팅만 사용 (모든 호스트에 매칭)
+    - paths:
+        - path: /api/tickets
+          pathType: Prefix
+  tls: []
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+database:
+  enabled: true
+  host: passit-dev-aurora-cluster.cluster-cnqmcq6uwqa3.ap-northeast-2.rds.amazonaws.com
+  port: 3306
+  name: passit_db
+  user: passit_user
+  password: passit_password
+env:
+  SPRING_PROFILES_ACTIVE: "production"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+  # AWS_REGION, SNS_TICKET_EVENTS_TOPIC_ARN, SQS_TICKET_DEAL_EVENTS_QUEUE_URL는
+  # ticket-aws-config ConfigMap에서 자동으로 주입됨 (envFrom 사용)
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8082
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8082
+  initialDelaySeconds: 50
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+# Valkey 설정 (ElastiCache for Valkey)
+redis:
+  host: "passit-dev-valkey.q2tpkl.ng.0001.apn2.cache.amazonaws.com"
+  port: 6379
+  password: ""
+  ssl: true
+s3:
+  bucket: "passit-dev-ticket-images-bucket"

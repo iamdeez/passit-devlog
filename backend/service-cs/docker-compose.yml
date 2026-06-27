@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  valkey:
+    image: valkey/valkey:7.2-alpine
+    container_name: cs-valkey
+    ports:
+      - "6381:6379"
+    command: >
+      valkey-server
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - valkey-data:/data
+    networks:
+      - passit-network
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: passit-service-cs
+    environment:
+      DB_HOST: host.docker.internal
+      DB_PORT: 3307
+      DB_NAME: passit_db
+      DB_USER: passit_user
+      DB_PASSWORD: passit_password
+      REDIS_HOST: valkey
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8085:8085"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - passit-network
+    depends_on:
+      valkey:
+        condition: service_healthy
+
+volumes:
+  valkey-data:
+
+networks:
+  passit-network:
+    external: true
+    name: passit-network

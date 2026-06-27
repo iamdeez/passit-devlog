@@ -1,0 +1,259 @@
+services:
+  # ─────────────────────────────────────────────
+  # service-account (인증/회원)  port: 8081
+  # ─────────────────────────────────────────────
+  - type: web
+    name: passit-account
+    runtime: image
+    image:
+      url: ghcr.io/iamdeez/service-account:latest
+    plan: free
+    region: singapore
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require&prepareThreshold=0
+      - key: SPRING_DATASOURCE_USERNAME
+        value: postgres.egiusvpctuqjkwrrhzvm
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+        value: org.postgresql.Driver
+      - key: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+        value: org.hibernate.dialect.PostgreSQLDialect
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: none
+      - key: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
+        value: "5"
+      - key: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
+        value: "1"
+      - key: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
+        value: "30000"
+      - key: SPRING_DATASOURCE_HIKARI_MAX_LIFETIME
+        value: "1800000"
+      - key: REDIS_HOST
+        value: pure-tortoise-98812.upstash.io
+      - key: REDIS_PORT
+        value: "6379"
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: REDIS_SSL
+        value: "true"
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_ACCESS_EXPIRATION
+        value: "3600000"
+      - key: JWT_REFRESH_EXPIRATION
+        value: "604800000"
+      - key: SPRING_MAIL_HOST
+        value: smtp.gmail.com
+      - key: SPRING_MAIL_PORT
+        value: "587"
+      - key: SPRING_MAIL_USERNAME
+        sync: false
+      - key: SPRING_MAIL_PASSWORD
+        sync: false
+      - key: KAKAO_REST_API_KEY
+        sync: false
+      - key: KAKAO_CLIENT_SECRET
+        sync: false
+      - key: KAKAO_REDIRECT_URI
+        value: https://passit-account.onrender.com/api/auth/kakao/callback
+      - key: AWS_ACCESS_KEY_ID
+        value: placeholder
+      - key: AWS_SECRET_ACCESS_KEY
+        value: placeholder
+      - key: AWS_REGION
+        value: ap-northeast-2
+      - key: SERVER_PORT
+        value: "10000"
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+  # ─────────────────────────────────────────────
+  # service-ticket (티켓 등록/조회)  port: 8082
+  # ─────────────────────────────────────────────
+  - type: web
+    name: passit-ticket
+    runtime: image
+    image:
+      url: ghcr.io/iamdeez/service-ticket:latest
+    plan: free
+    region: singapore
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require&prepareThreshold=0
+      - key: SPRING_DATASOURCE_USERNAME
+        value: postgres.egiusvpctuqjkwrrhzvm
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+        value: org.postgresql.Driver
+      - key: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+        value: org.hibernate.dialect.PostgreSQLDialect
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: none
+      - key: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
+        value: "5"
+      - key: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
+        value: "1"
+      - key: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
+        value: "30000"
+      - key: SPRING_DATASOURCE_HIKARI_MAX_LIFETIME
+        value: "1800000"
+      - key: AWS_ACCESS_KEY_ID
+        value: placeholder
+      - key: AWS_SECRET_ACCESS_KEY
+        value: placeholder
+      - key: AWS_REGION
+        value: ap-northeast-2
+      - key: AWS_S3_BUCKET
+        value: passit-bucket
+      - key: SPRING_CLOUD_AWS_SQS_ENABLED
+        value: "false"
+      - key: SPRING_CLOUD_AWS_SQS_LISTENER_AUTO_STARTUP
+        value: "false"
+      - key: MANAGEMENT_HEALTH_SQS_ENABLED
+        value: "false"
+      - key: SERVER_PORT
+        value: "10000"
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+  # ─────────────────────────────────────────────
+  # service-trade (안전거래)  port: 8083
+  # ─────────────────────────────────────────────
+  - type: web
+    name: passit-trade
+    runtime: image
+    image:
+      url: ghcr.io/iamdeez/service-trade:latest
+    plan: free
+    region: singapore
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require&prepareThreshold=0
+      - key: SPRING_DATASOURCE_USERNAME
+        value: postgres.egiusvpctuqjkwrrhzvm
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+        value: org.postgresql.Driver
+      - key: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+        value: org.hibernate.dialect.PostgreSQLDialect
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: none
+      - key: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
+        value: "5"
+      - key: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
+        value: "1"
+      - key: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
+        value: "30000"
+      - key: SPRING_DATASOURCE_HIKARI_MAX_LIFETIME
+        value: "1800000"
+      - key: API_TICKET_SERVICE_URL
+        value: https://passit-ticket.onrender.com
+      - key: AWS_ACCESS_KEY_ID
+        value: placeholder
+      - key: AWS_SECRET_ACCESS_KEY
+        value: placeholder
+      - key: AWS_REGION
+        value: ap-northeast-2
+      - key: SNS_DEAL_EVENTS_TOPIC_ARN
+        value: arn:aws:sns:ap-northeast-2:000000000000:deal-events
+      - key: SNS_TICKET_EVENTS_TOPIC_ARN
+        value: arn:aws:sns:ap-northeast-2:000000000000:ticket-events
+      - key: SNS_PAYMENT_EVENTS_TOPIC_ARN
+        value: arn:aws:sns:ap-northeast-2:000000000000:payment-events
+      - key: SQS_TRADE_TICKET_EVENTS_QUEUE_URL
+        value: https://sqs.ap-northeast-2.amazonaws.com/000000000000/trade-ticket-events
+      - key: SERVER_PORT
+        value: "10000"
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+  # ─────────────────────────────────────────────
+  # service-chat (실시간 채팅)  port: 8084
+  # ─────────────────────────────────────────────
+  - type: web
+    name: passit-chat
+    runtime: image
+    image:
+      url: ghcr.io/iamdeez/service-chat:latest
+    plan: free
+    region: singapore
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require&prepareThreshold=0
+      - key: SPRING_DATASOURCE_USERNAME
+        value: postgres.egiusvpctuqjkwrrhzvm
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+        value: org.postgresql.Driver
+      - key: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+        value: org.hibernate.dialect.PostgreSQLDialect
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: none
+      - key: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
+        value: "5"
+      - key: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
+        value: "1"
+      - key: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
+        value: "30000"
+      - key: SPRING_DATASOURCE_HIKARI_MAX_LIFETIME
+        value: "1800000"
+      - key: REDIS_HOST
+        value: pure-tortoise-98812.upstash.io
+      - key: REDIS_PORT
+        value: "6379"
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: REDIS_SSL
+        value: "true"
+      - key: SERVER_PORT
+        value: "10000"
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+  # ─────────────────────────────────────────────
+  # service-cs (고객센터/문의)  port: 8085
+  # ─────────────────────────────────────────────
+  - type: web
+    name: passit-cs
+    runtime: image
+    image:
+      url: ghcr.io/iamdeez/service-cs:latest
+    plan: free
+    region: singapore
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require&prepareThreshold=0
+      - key: SPRING_DATASOURCE_USERNAME
+        value: postgres.egiusvpctuqjkwrrhzvm
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+        value: org.postgresql.Driver
+      - key: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+        value: org.hibernate.dialect.PostgreSQLDialect
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: none
+      - key: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
+        value: "5"
+      - key: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
+        value: "1"
+      - key: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
+        value: "30000"
+      - key: SPRING_DATASOURCE_HIKARI_MAX_LIFETIME
+        value: "1800000"
+      - key: JWT_SECRET
+        sync: false
+      - key: SERVER_PORT
+        value: "10000"
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod

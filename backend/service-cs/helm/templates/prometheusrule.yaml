@@ -1,0 +1,33 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "template-service.fullname" . }}-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: service-cs.rules
+      rules:
+        - alert: ServiceCsHigh5xxErrorRate
+          expr: |
+            100 *
+            sum(rate(http_server_requests_seconds_count{
+              application="service-cs",
+              status=~"5.."
+            }[1m]))
+            /
+            sum(rate(http_server_requests_seconds_count{
+              application="service-cs"
+            }[1m]))
+            > 5
+          for: 1m
+          labels:
+            severity: critical
+            service: service-cs
+          annotations:
+            summary: "Service CS 5xx error rate high"
+            description: "service-cs 5xx error rate > 5% for 1 minute"
+  {{- end }}
+

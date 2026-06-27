@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
+
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8083
+
+logging:
+  level:
+    com.company.trade: INFO
+    org.springframework: WARN
+
+# AWS Configuration
+# 값은 Terraform이 생성한 ConfigMap(trade-aws-config)에서 자동 주입됨
+aws:
+  region: ${AWS_REGION}
+  sns:
+    topics:
+      deal-events: ${SNS_DEAL_EVENTS_TOPIC_ARN}
+      ticket-events: ${SNS_TICKET_EVENTS_TOPIC_ARN}
+      payment-events: ${SNS_PAYMENT_EVENTS_TOPIC_ARN}
+  sqs:
+    queues:
+      trade-ticket-events: ${SQS_TRADE_TICKET_EVENTS_QUEUE_URL}

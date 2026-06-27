@@ -1,0 +1,95 @@
+replicaCount: 2
+image:
+  repository: ghcr.io/cld4-t2-iamconan/service-account
+  pullPolicy: Always
+  tag: "sha-97ae8e2"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8081
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/group.name: passit-dev-alb
+    alb.ingress.kubernetes.io/load-balancer-name: passit-dev-alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health/readiness
+    alb.ingress.kubernetes.io/healthcheck-port: "8081"
+    alb.ingress.kubernetes.io/success-codes: "200"
+  hosts:
+    # host 필드 제거 - Path 기반 라우팅만 사용 (모든 호스트에 매칭)
+    - paths:
+        - path: /api/auth
+          pathType: Prefix
+        - path: /api/users
+          pathType: Prefix
+  tls: []
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+database:
+  enabled: true
+  host: passit-dev-aurora-cluster.cluster-cnqmcq6uwqa3.ap-northeast-2.rds.amazonaws.com
+  port: 3306
+  name: passit_db
+  user: passit_user
+  password: passit_password
+# Valkey 설정 (ElastiCache for Valkey)
+redis:
+  host: "passit-dev-valkey.q2tpkl.ng.0001.apn2.cache.amazonaws.com"
+  port: 6379
+  password: ""
+  ssl: true
+env:
+  SPRING_PROFILES_ACTIVE: "production"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+  # CORS 허용 Origin (CloudFront 도메인 포함)
+  CORS_ALLOWED_ORIGINS: "https://dmvwgbcww82sl.cloudfront.net,http://localhost:3000,http://localhost:3001"
+  # 카카오 로그인 설정
+  # CloudFront를 통한 백엔드 콜백 URL
+  KAKAO_REDIRECT_URI: "https://dmvwgbcww82sl.cloudfront.net/api/auth/kakao/callback"
+  # 프론트엔드 배포 URL (카카오 로그인 후 리다이렉트)
+  FRONTEND_URL: "https://dmvwgbcww82sl.cloudfront.net"
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8081
+  initialDelaySeconds: 180
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8081
+  initialDelaySeconds: 120
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+# ServiceAccount는 Terraform IRSA 모듈이 생성 (account-sa)
+# Helm에서는 생성하지 않고 기존 것을 사용
+serviceAccount:
+  create: false
+  name: account-sa # Terraform이 생성한 ServiceAccount 사용
+s3:
+  bucket: passit-dev-profile-images-bucket
+
+monitoring:
+  enabled: true
+  interval: 15s

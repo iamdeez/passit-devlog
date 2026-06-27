@@ -1,0 +1,70 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+    show-sql: true
+
+  h2:
+    console:
+      enabled: false
+
+  # Redis/Valkey 설정 (테스트용 - Testcontainers 또는 Embedded Redis 사용)
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      ssl:
+        enabled: false
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+          max-wait: -1ms
+      timeout: 3000ms
+
+  # 캐시 설정
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000  # 기본 TTL: 5분 (밀리초)
+      cache-null-values: false
+      key-prefix: "account:"
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test@example.com
+    password: test-password
+
+logging:
+  level:
+    com.company.account: DEBUG
+    org.springframework: INFO
+
+# 초기 관리자 계정 설정 (테스트용)
+app:
+  admin:
+    email: admin@test.com
+    password: admin123!
+    name: 테스트 관리자
+    nickname: admin
+
+# 카카오 로그인 설정 (테스트용)
+kakao:
+  rest-api-key: test-rest-api-key
+  client-secret: test-client-secret
+  admin-key: test-admin-key
+  redirect-uri: http://localhost:8081/api/auth/kakao/callback
+  frontend-url: http://localhost:3000

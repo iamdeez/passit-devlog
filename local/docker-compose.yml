@@ -1,0 +1,262 @@
+services:
+
+  # ─────────────────────────────────────────
+  # 인프라
+  # ─────────────────────────────────────────
+
+  mysql:
+    image: mysql:8.0
+    container_name: passit-mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_USER: ${MYSQL_USER:-passit_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-passit_password}
+      MYSQL_DATABASE: ${DB_NAME:-passit_db}
+    ports:
+      - "${MYSQL_PORT:-3307}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - passit-network
+
+  valkey:
+    image: valkey/valkey:7.2-alpine
+    container_name: passit-valkey
+    command: >
+      valkey-server
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - valkey_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - passit-network
+
+  localstack:
+    image: localstack/localstack:3.8.1
+    container_name: passit-localstack
+    environment:
+      SERVICES: s3
+      DEFAULT_REGION: ${AWS_REGION:-ap-northeast-2}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-test}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-test}
+    ports:
+      - "4566:4566"
+    volumes:
+      - ./localstack/init-s3.sh:/etc/localstack/init/ready.d/init-s3.sh
+      - localstack_data:/var/lib/localstack
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - passit-network
+
+  # ─────────────────────────────────────────
+  # 마이크로서비스 (GHCR SHA 태그 고정)
+  # ─────────────────────────────────────────
+
+  service-account:
+    image: ghcr.io/cld4-t2-iamconan/service-account:sha-0d0f56c
+    container_name: passit-service-account
+    platform: linux/amd64
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-passit_db}
+      DB_USER: ${MYSQL_USER:-passit_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-passit_password}
+      REDIS_HOST: valkey
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@passit.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123!}
+      ADMIN_NAME: ${ADMIN_NAME:-관리자}
+      ADMIN_NICKNAME: ${ADMIN_NICKNAME:-admin}
+      # 이메일 (선택 - 미설정 시 이메일 발송 비활성)
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      # Kakao OAuth (선택 - 미설정 시 이메일 로그인만 동작)
+      KAKAO_REST_API_KEY: ${KAKAO_REST_API_KEY:-}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-}
+      KAKAO_REDIRECT_URI: ${KAKAO_REDIRECT_URI:-http://localhost:8081/api/auth/kakao/callback}
+    ports:
+      - "${ACCOUNT_PORT:-8081}:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8081/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - passit-network
+
+  service-ticket:
+    image: ghcr.io/cld4-t2-iamconan/service-ticket:sha-1120ae5
+    container_name: passit-service-ticket
+    platform: linux/amd64
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-passit_db}
+      DB_USER: ${MYSQL_USER:-passit_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-passit_password}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # S3 (LocalStack)
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-test}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-test}
+      AWS_REGION: ${AWS_REGION:-ap-northeast-2}
+      AWS_S3_ENDPOINT: ${AWS_S3_ENDPOINT:-http://localstack:4566}
+      S3_BUCKET: ${S3_BUCKET:-passit-bucket}
+    ports:
+      - "${TICKET_PORT:-8082}:8082"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8082"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - passit-network
+
+  service-trade:
+    image: ghcr.io/cld4-t2-iamconan/service-trade:sha-6b1f19a
+    container_name: passit-service-trade
+    platform: linux/amd64
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-passit_db}
+      DB_USER: ${MYSQL_USER:-passit_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-passit_password}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      TICKET_SERVICE_URL: http://service-ticket:8082
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+    ports:
+      - "${TRADE_PORT:-8083}:8083"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8083/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - passit-network
+
+  service-chat:
+    image: ghcr.io/cld4-t2-iamconan/service-chat:sha-2bfea7b
+    container_name: passit-service-chat
+    platform: linux/amd64
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-passit_db}
+      DB_USER: ${MYSQL_USER:-passit_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-passit_password}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+    ports:
+      - "${CHAT_PORT:-8084}:8084"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8084/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - passit-network
+
+  service-cs:
+    image: ghcr.io/cld4-t2-iamconan/service-cs:sha-662714c
+    container_name: passit-service-cs
+    platform: linux/amd64
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-passit_db}
+      DB_USER: ${MYSQL_USER:-passit_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-passit_password}
+      REDIS_HOST: valkey
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "${CS_PORT:-8085}:8085"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8085/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 200s
+    networks:
+      - passit-network
+
+  # ─────────────────────────────────────────
+  # API 게이트웨이 (CloudFront 로컬 재현)
+  # ─────────────────────────────────────────
+
+  nginx:
+    image: nginx:alpine
+    container_name: passit-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - service-account
+      - service-ticket
+      - service-trade
+      - service-chat
+      - service-cs
+    networks:
+      - passit-network
+
+volumes:
+  mysql_data:
+  valkey_data:
+  localstack_data:
+
+networks:
+  passit-network:
+    name: passit-network
+    driver: bridge

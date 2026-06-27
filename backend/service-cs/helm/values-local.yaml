@@ -1,0 +1,60 @@
+# Local Kubernetes 환경 설정
+
+# 서비스 이름 중복 방지
+fullnameOverride: service-cs
+
+replicaCount: 1
+
+image:
+  repository: service-cs
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8085
+
+ingress:
+  enabled: false
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+
+# 로컬 MySQL 연결 (Kind 클러스터 내부)
+database:
+  enabled: true
+  host: mysql
+  port: 3306
+  name: passit_db
+  user: passit_user
+  password: passit_password
+
+env:
+  SPRING_PROFILES_ACTIVE: "default"
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8085
+  initialDelaySeconds: 90
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8085
+  initialDelaySeconds: 60
+  periodSeconds: 5
+
+# 로컬 환경에서는 IRSA 불필요
+serviceAccount:
+  annotations: {}

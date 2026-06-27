@@ -1,0 +1,77 @@
+replicaCount: 2
+
+image:
+  repository: trade-service
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8083
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: trade-service.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+database:
+  enabled: true
+  host: localhost
+  port: 3306
+  name: passit_db
+  user: passit_user
+  password: passit_password
+
+# Valkey 설정 (ElastiCache for Valkey)
+redis:
+  host: "passit-dev-eks.xxxxx.cache.amazonaws.com" # ElastiCache for Valkey 엔드포인트로 변경 필요
+  port: 6379
+  password: "" # ElastiCache 비밀번호가 있는 경우 설정
+  ssl: true
+
+env:
+  SPRING_PROFILES_ACTIVE: "production"
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8083
+  initialDelaySeconds: 70
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8083
+  initialDelaySeconds: 60
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+monitoring:
+  enabled: true
+  path: /actuator/prometheus
+  interval: 15s

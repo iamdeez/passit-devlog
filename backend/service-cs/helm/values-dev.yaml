@@ -1,0 +1,81 @@
+# Override resource names to avoid duplication
+fullnameOverride: cs-service
+
+replicaCount: 2
+image:
+  repository: ghcr.io/cld4-t2-iamconan/service-cs
+  pullPolicy: Always
+  tag: "sha-62706b7"
+imagePullSecrets:
+  - name: ghcr-pull-secret
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8085
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/group.name: passit-dev-alb
+    alb.ingress.kubernetes.io/load-balancer-name: passit-dev-alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+  hosts:
+    # host 필드 제거 - Path 기반 라우팅만 사용 (모든 호스트에 매칭)
+    - paths:
+        - path: /api/cs
+          pathType: Prefix
+        - path: /api/notices
+          pathType: Prefix
+        - path: /api/faqs
+          pathType: Prefix
+        - path: /api/inquiries
+          pathType: Prefix
+  tls: []
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+database:
+  enabled: true
+  host: passit-dev-aurora-cluster.cluster-cnqmcq6uwqa3.ap-northeast-2.rds.amazonaws.com
+  port: 3306
+  name: passit_db
+  user: passit_user
+  password: passit_password
+env:
+  SPRING_PROFILES_ACTIVE: "production"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8085
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8085
+  initialDelaySeconds: 50
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+# Valkey 설정 (ElastiCache for Valkey)
+redis:
+  host: "passit-dev-valkey.q2tpkl.ng.0001.apn2.cache.amazonaws.com"
+  port: 6379
+  password: ""
+  ssl: true

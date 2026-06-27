@@ -75,7 +75,7 @@ npm install && npm start
 
 ## 데모
 
-**라이브 데모**: <!-- TODO: 배포된 Vercel demo URL 입력 --> _(준비 중)_
+**라이브 데모**: https://passit-demo.vercel.app (백엔드 없이 mock 데이터로 동작하는 Demo Mode)
 
 백엔드 없이 mock 데이터로 동작하는 **Demo Mode**로 로컬에서 바로 실행할 수 있다.
 

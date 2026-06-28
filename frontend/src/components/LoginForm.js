@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import authService from "../services/authService";
+import { isDemoMode } from "../demo/demoConfig";
 
 const KAKAO_ICON = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTkgMEMxMy45NzA2IDAgMTggMy4zODI3IDE4IDcuNTY3NjlDMTggMTEuNzUyNyAxMy45NzA2IDE1LjEzNTQgOSAxNS4xMzU0QzguMTI3MTggMTUuMTM1NCA3LjI5NDI1IDE1LjAyMDQgNi41MDk1NCAxNC44MDc4TDIuOTM5ODEgMTcuNDYwOUMyLjY2NDE4IDE3LjY5NDkgMi4yNzg0MSAxNy42NDgxIDIuMDU0NjkgMTcuMzU0OUMxLjk0MTE5IDE3LjIwODkgMS44ODM0OSAxNy4wMjI3IDEuODkxNTkgMTYuODMyM0wyLjExNDQyIDEyLjkxNTlDMC43ODU3MzggMTEuNjM0IDAgOS42OTc3NiAwIDcuNTY3NjlDMCAzLjM4MjcgNC4wMjk0NCAwIDkgMFoiIGZpbGw9IiMwMDAwMDAiLz4KPC9zdmc+";
 
@@ -31,6 +32,14 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
 
   const handleKakaoLogin = () => { window.location.href = authService.getKakaoLoginUrl(); };
 
+  const handleDemoLogin = async (email) => {
+    setError(""); setLoading(true);
+    try {
+      const result = await login(email, "demo");
+      if (result.success) onLoginSuccess(result.user);
+    } finally { setLoading(false); }
+  };
+
   return (
     <div className="w-full h-full flex flex-col">
       <div className="mb-6">
@@ -41,6 +50,30 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
       <form onSubmit={handleSubmit} className="flex flex-col gap-5 flex-1 justify-between">
         <div className="space-y-4">
           {error && <div className="px-4 py-3 rounded-xl bg-red-50 text-red-600 text-sm">{error}</div>}
+
+          {/* 데모 체험 — 데모 모드에서만 노출 */}
+          {isDemoMode() && (
+            <div className="rounded-xl border border-primary/30 bg-primary/5 p-3.5 space-y-2.5">
+              <div className="flex items-center gap-1.5 text-primary">
+                <span className="material-symbols-outlined text-[18px]">bolt</span>
+                <span className="text-sm font-display font-bold">데모 체험 — 가입 없이 바로 둘러보기</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button type="button" onClick={() => handleDemoLogin("demo@passit.app")} disabled={loading}
+                  className="py-2.5 rounded-xl bg-primary text-on-primary text-sm font-display font-bold hover:bg-primary-dim active:scale-[0.97] transition-all disabled:opacity-60">
+                  구매자로 둘러보기
+                </button>
+                <button type="button" onClick={() => handleDemoLogin("admin@passit.app")} disabled={loading}
+                  className="py-2.5 rounded-xl border border-primary text-primary text-sm font-display font-bold hover:bg-primary/10 active:scale-[0.97] transition-all disabled:opacity-60">
+                  관리자로 둘러보기
+                </button>
+              </div>
+              <p className="text-[11px] leading-relaxed text-on-surface-variant">
+                백엔드 없이 mock 데이터로 동작합니다. 아래 폼에 아무 이메일/비밀번호를 넣어도 로그인됩니다
+                (<span className="font-medium">admin</span> 포함 시 관리자).
+              </p>
+            </div>
+          )}
 
           {/* 카카오 로그인 */}
           <button type="button" onClick={handleKakaoLogin}

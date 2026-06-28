@@ -1,11 +1,13 @@
 import { buildPage, demoTickets, demoUser } from "./demoData";
 
 const categoryMap = {
-  1: "콘서트",
-  2: "뮤지컬",
-  3: "스포츠",
-  4: "전시",
-  5: "클래식",
+  1: "뮤지컬",
+  2: "연극",
+  3: "콘서트",
+  4: "스포츠",
+  5: "전시",
+  6: "클래식",
+  7: "기타",
 };
 
 const normalize = (value) => String(value || "").toLowerCase();

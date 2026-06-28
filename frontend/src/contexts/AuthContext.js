@@ -3,6 +3,8 @@ import axios from "axios";
 import supabase from "../config/supabaseClient";
 import { API_SERVICES } from "../config/apiConfig";
 import { ENDPOINTS } from "../api/endpoints";
+import { isDemoMode } from "../demo/demoConfig";
+import { demoUser, demoAdmin } from "../demo/demoData";
 
 const AuthContext = createContext(null);
 
@@ -33,6 +35,17 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     let mounted = true;
+
+    // 데모 모드: 백엔드/Supabase 없이 localStorage 세션만 복원한다.
+    if (isDemoMode()) {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+        setIsAuthenticated(true);
+      }
+      setLoading(false);
+      return () => { mounted = false; };
+    }
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!mounted) return;
@@ -80,6 +93,18 @@ export const AuthProvider = ({ children }) => {
   }, [buildUser]);
 
   const login = useCallback(async (email, password) => {
+    // 0) 데모 모드: 백엔드 없이 데모 계정으로 매핑한다.
+    //    이메일에 "admin"이 포함되면 관리자 데모, 그 외에는 구매자 데모로 로그인된다(비밀번호 무관).
+    if (isDemoMode()) {
+      const acct = /admin/i.test(email || "") ? demoAdmin : demoUser;
+      localStorage.setItem("token", "demo-access-token");
+      localStorage.setItem("refreshToken", "demo-refresh-token");
+      localStorage.setItem("user", JSON.stringify(acct));
+      setUser(acct);
+      setIsAuthenticated(true);
+      return { success: true, user: acct };
+    }
+
     // 1) Supabase 로그인 시도 (일반 사용자)
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (!error) {

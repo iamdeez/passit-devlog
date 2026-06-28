@@ -1,3 +1,5 @@
+import { demoInquiries, demoReports } from "./demoData";
+
 const demoNotices = [
   {
     id: 1,
@@ -50,8 +52,8 @@ const demoFaqs = [
   },
 ];
 
-let _inquiries = [];
-let _reports = [];
+let _inquiries = demoInquiries.map((i) => ({ ...i }));
+let _reports = demoReports.map((r) => ({ ...r }));
 
 export const demoCsService = {
   async getNotices(params = {}) {

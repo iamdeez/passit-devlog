@@ -106,7 +106,7 @@ const BuyerPaymentPage = () => {
 
   return (
     <div className="bg-surface text-on-surface min-h-screen pb-32">
-      <header className="fixed top-0 w-full z-50 flex items-center justify-between px-4 h-16 bg-surface border-b border-outline-variant">
+      <header className="fixed top-0 inset-x-0 mx-auto w-full max-w-md z-50 flex items-center justify-between px-4 h-16 bg-surface border-b border-outline-variant">
         <div className="flex items-center gap-4">
           <button
             type="button"
@@ -273,7 +273,7 @@ const BuyerPaymentPage = () => {
         </div>
       </main>
 
-      <footer className="fixed bottom-0 w-full bg-surface-container-lowest border-t border-outline-variant p-4 z-50">
+      <footer className="fixed bottom-0 inset-x-0 mx-auto w-full max-w-md bg-surface-container-lowest border-t border-outline-variant p-4 z-50">
         <div className="max-w-2xl mx-auto">
           {paying ? (
             <div className="h-14 flex items-center justify-center">

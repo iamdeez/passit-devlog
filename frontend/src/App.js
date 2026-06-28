@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import { LoadingSpinner } from "./components/common/LoadingSpinner";
@@ -80,6 +80,26 @@ const BuyerPaymentPage = lazy(() => import("./pages/BuyerPaymentPage"));
 const PaymentResultPage = lazy(() => import("./pages/PaymentResultPage"));
 
 
+/**
+ * 앱 셸 — 사용자 화면은 모바일 앱 프레임(가운데 정렬, max-w-md)으로 감싼다.
+ * 관리자(/admin)는 데스크톱 대시보드라 프레임을 적용하지 않고 전체 폭으로 렌더한다.
+ * 고정 바(NavBar/BottomNav/페이지 헤더)는 inset-x-0 mx-auto max-w-md 로 프레임 폭에 맞춰 중앙 고정된다.
+ */
+function AppShell({ children }) {
+  const { pathname } = useLocation();
+  if (pathname.startsWith("/admin")) return children;
+
+  return (
+    <div className="min-h-screen bg-[#e7e4f0]">
+      <div className="relative mx-auto w-full max-w-md min-h-screen bg-background shadow-xl">
+        <NavBar />
+        {children}
+        <BottomNav />
+      </div>
+    </div>
+  );
+}
+
 function App() {
   return (
     <ErrorBoundary>
@@ -87,10 +107,7 @@ function App() {
           <AuthProvider>
             <Router>
               <Suspense fallback={<LoadingSpinner fullPage message="페이지를 불러오는 중..." />}>
-                {/* 네비게이션 */}
-                <NavBar />
-                <BottomNav />
-
+                <AppShell>
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/auth" element={<AuthPage />} />
@@ -346,6 +363,7 @@ function App() {
                   {/* 404 */}
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
+                </AppShell>
               </Suspense>
             </Router>
           </AuthProvider>

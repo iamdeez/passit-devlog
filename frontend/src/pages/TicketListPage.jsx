@@ -132,7 +132,7 @@ export default function TicketListPage() {
 
   return (
     <div className="min-h-screen bg-background font-body text-on-surface pb-24">
-      <header className="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant shadow-sm flex items-center justify-between px-4 h-16">
+      <header className="fixed top-0 inset-x-0 mx-auto w-full max-w-md z-50 bg-surface border-b border-outline-variant shadow-sm flex items-center justify-between px-4 h-16">
         <button type="button" onClick={() => navigate("/")} className="flex items-center gap-2">
           <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
             confirmation_number

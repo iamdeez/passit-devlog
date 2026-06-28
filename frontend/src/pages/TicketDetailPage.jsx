@@ -203,7 +203,7 @@ export default function TicketDetailPage() {
 
   return (
     <div className="min-h-screen bg-surface text-on-surface selection:bg-primary-container">
-      <header className="fixed top-0 w-full z-50 flex items-center justify-between px-4 h-16 bg-surface border-b border-outline-variant">
+      <header className="fixed top-0 inset-x-0 mx-auto w-full max-w-md z-50 flex items-center justify-between px-4 h-16 bg-surface border-b border-outline-variant">
         <div className="flex items-center gap-3">
           <button
             type="button"

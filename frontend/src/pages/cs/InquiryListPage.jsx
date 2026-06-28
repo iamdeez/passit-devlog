@@ -45,7 +45,7 @@ const InquiryListPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
+    <div className="min-h-screen bg-background pb-16">
       <PageHeader
         icon="question_answer"
         title="문의 목록"

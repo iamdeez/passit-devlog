@@ -52,8 +52,8 @@ export default function NavBar() {
   return (
     <>
       {/* AppBar — Stitch 스타일: backdrop-blur + surface/80 */}
-      <header className="fixed top-0 left-0 right-0 z-[1000] h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30">
-        <div className="max-w-[1280px] mx-auto h-full px-6 flex items-center justify-between">
+      <header className="fixed top-0 inset-x-0 mx-auto max-w-md z-[1000] h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30">
+        <div className="w-full h-full px-4 flex items-center justify-between">
 
           {/* Logo */}
           <button
@@ -64,8 +64,8 @@ export default function NavBar() {
             <span className="text-2xl font-display font-black tracking-tight">PASSIT</span>
           </button>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8 h-full flex-1 ml-10">
+          {/* Desktop Nav — 앱 모드에서는 숨김 (드로어로 대체) */}
+          <nav className="hidden items-center gap-8 h-full flex-1 ml-10">
             {navLinks.map((item) => (
               <button key={item.label} onClick={() => navigate(item.path)} className={linkCls(item.path)}>
                 {item.label}
@@ -110,8 +110,8 @@ export default function NavBar() {
             </button>
           </nav>
 
-          {/* Desktop Right */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Desktop Right — 앱 모드에서는 숨김 */}
+          <div className="hidden items-center gap-3">
             {isAuthenticated ? (
               <>
                 <button
@@ -159,22 +159,31 @@ export default function NavBar() {
             )}
           </div>
 
-          {/* Mobile Action */}
-          <button
-            className="md:hidden w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all duration-150"
-            onClick={() => navigate("/notifications")}
-            aria-label="알림"
-          >
-            <span className="material-symbols-outlined text-[24px]">notifications</span>
-          </button>
+          {/* App Action — 알림 + 메뉴(드로어) */}
+          <div className="flex items-center gap-0.5">
+            <button
+              className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all duration-150"
+              onClick={() => navigate("/notifications")}
+              aria-label="알림"
+            >
+              <span className="material-symbols-outlined text-[24px]">notifications</span>
+            </button>
+            <button
+              className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all duration-150"
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label="메뉴"
+            >
+              <span className="material-symbols-outlined text-[24px]">{mobileOpen ? "close" : "menu"}</span>
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Mobile Drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-[999] md:hidden animate-fade-in">
+        <div className="fixed inset-0 z-[999] animate-fade-in">
           <div className="absolute inset-0 bg-black/20" onClick={() => setMobileOpen(false)} />
-          <div className="absolute top-16 left-0 right-0 bg-surface-container-lowest border-b border-outline-variant/30 animate-slide-down">
+          <div className="absolute top-16 inset-x-0 mx-auto max-w-md bg-surface-container-lowest border-b border-outline-variant/30 animate-slide-down">
             {isAuthenticated && user && (
               <div className="px-5 py-3.5 border-b border-outline-variant/20 flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-surface-container-high border border-outline-variant text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">

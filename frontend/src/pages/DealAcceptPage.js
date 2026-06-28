@@ -195,7 +195,7 @@ const DealAcceptPage = () => {
 
   return (
     <div className="bg-background text-on-background min-h-screen pb-32">
-      <header className="fixed top-0 w-full z-50 flex items-center px-4 h-16 bg-surface border-b border-outline-variant transition-colors duration-200">
+      <header className="fixed top-0 inset-x-0 mx-auto w-full max-w-md z-50 flex items-center px-4 h-16 bg-surface border-b border-outline-variant transition-colors duration-200">
         <button
           type="button"
           onClick={() => navigate(-1)}

@@ -111,7 +111,7 @@ export default function ChatRoomPage() {
 
   return (
     <div className="bg-surface-container-low text-on-surface min-h-screen max-w-md mx-auto">
-      <header className="fixed top-0 left-0 right-0 z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-4 h-16 max-w-md mx-auto">
+      <header className="fixed top-0 inset-x-0 mx-auto max-w-md z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-4 h-16 max-w-md mx-auto">
         <button onClick={() => navigate("/chat")} className="w-10 h-10 flex items-center justify-center hover:bg-surface-container-high transition-colors rounded-full active:scale-95">
           <span className="material-symbols-outlined text-on-surface">arrow_back</span>
         </button>
@@ -220,7 +220,7 @@ export default function ChatRoomPage() {
         </button>
       </div>
 
-      <nav className="fixed bottom-0 left-0 right-0 mx-auto max-w-md z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-outline-variant shadow-lg rounded-t-xl">
+      <nav className="fixed bottom-0 inset-x-0 mx-auto max-w-md mx-auto max-w-md z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-outline-variant shadow-lg rounded-t-xl">
         {[
           ["홈", "home", "/"],
           ["티켓", "confirmation_number", "/tickets"],

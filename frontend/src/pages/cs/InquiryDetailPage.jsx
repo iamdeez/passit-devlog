@@ -27,7 +27,7 @@ const InquiryDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pt-16 pb-16 md:pb-0">
+      <div className="min-h-screen bg-background pt-16 pb-16">
         <div className="min-h-[50vh] flex items-center justify-center">
           <Spinner size="lg" />
         </div>
@@ -37,7 +37,7 @@ const InquiryDetailPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background pt-16 pb-16 md:pb-0">
+      <div className="min-h-screen bg-background pt-16 pb-16">
         <div className="max-w-3xl mx-auto px-4 py-8">
           <div className="px-4 py-3 rounded-xl bg-error-container text-error text-sm">{error}</div>
         </div>
@@ -47,7 +47,7 @@ const InquiryDetailPage = () => {
 
   if (!inquiry) {
     return (
-      <div className="min-h-screen bg-background pt-16 pb-16 md:pb-0">
+      <div className="min-h-screen bg-background pt-16 pb-16">
         <div className="max-w-3xl mx-auto px-4 py-8">
           <p className="text-on-surface-variant text-sm">문의 데이터가 없습니다.</p>
         </div>
@@ -65,7 +65,7 @@ const InquiryDetailPage = () => {
     : null;
 
   return (
-    <div className="min-h-screen bg-background pt-16 pb-16 md:pb-0">
+    <div className="min-h-screen bg-background pt-16 pb-16">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <button
           onClick={() => navigate(-1)}

@@ -31,7 +31,7 @@ export default function ReportDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pt-16 pb-16 md:pb-0">
+      <div className="min-h-screen bg-background pt-16 pb-16">
         <div className="min-h-[50vh] flex items-center justify-center">
           <Spinner size="lg" />
         </div>
@@ -41,7 +41,7 @@ export default function ReportDetailPage() {
 
   if (errorMsg) {
     return (
-      <div className="min-h-screen bg-background pt-16 pb-16 md:pb-0">
+      <div className="min-h-screen bg-background pt-16 pb-16">
         <div className="max-w-3xl mx-auto px-4 py-8">
           <div className="px-4 py-3 rounded-xl bg-error-container text-error text-sm">
             {errorMsg}
@@ -53,7 +53,7 @@ export default function ReportDetailPage() {
 
   if (!report) {
     return (
-      <div className="min-h-screen bg-background pt-16 pb-16 md:pb-0">
+      <div className="min-h-screen bg-background pt-16 pb-16">
         <div className="max-w-3xl mx-auto px-4 py-8">
           <p className="text-on-surface-variant text-sm">데이터가 없습니다.</p>
         </div>
@@ -71,7 +71,7 @@ export default function ReportDetailPage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-background pt-16 pb-16 md:pb-0">
+    <div className="min-h-screen bg-background pt-16 pb-16">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <button
           onClick={() => navigate(-1)}

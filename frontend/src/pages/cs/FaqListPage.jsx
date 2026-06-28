@@ -32,7 +32,7 @@ export default function FaqListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
+    <div className="min-h-screen bg-background pb-16">
       <PageHeader
         icon="help"
         title="자주 묻는 질문"

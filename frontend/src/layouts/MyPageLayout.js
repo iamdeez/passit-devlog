@@ -21,10 +21,10 @@ export default function MyPageLayout() {
   const { user, logout } = useAuth();
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
-      <div className="max-w-[1200px] mx-auto px-0 md:px-6 py-0 md:py-6 mt-0 md:mt-16 flex gap-6">
-        {/* Desktop Sidebar */}
-        <aside className="hidden md:block w-56 flex-shrink-0">
+    <div className="min-h-screen bg-background pb-20">
+      <div className="w-full mx-auto px-0 py-0 mt-0 flex gap-6">
+        {/* Desktop Sidebar — 앱 모드에서는 숨김 (BottomNav + 드로어로 내비게이션) */}
+        <aside className="hidden w-56 flex-shrink-0">
           {/* 프로필 카드 */}
           <div className="bg-white rounded-2xl border border-outline-variant/30 overflow-hidden mb-3">
             <div className="px-4 pt-5 pb-4 flex flex-col items-center text-center">

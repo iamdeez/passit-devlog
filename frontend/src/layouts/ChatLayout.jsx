@@ -11,7 +11,7 @@ export default function ChatLayout() {
       {/* List panel */}
       <div
         className={`flex-col flex-shrink-0 border-r border-outline-variant/30 bg-surface-container-lowest overflow-hidden
-          ${hasRoom ? "hidden md:flex md:w-80 lg:w-96" : "flex w-full md:w-80 lg:w-96"}`}
+          ${hasRoom ? "hidden" : "flex w-full"}`}
       >
         <ChatListPage embedded />
       </div>
@@ -19,7 +19,7 @@ export default function ChatLayout() {
       {/* Room panel */}
       <div
         className={`flex-1 overflow-hidden flex-col
-          ${hasRoom ? "flex" : "hidden md:flex"}`}
+          ${hasRoom ? "flex" : "hidden"}`}
       >
         {hasRoom ? (
           <Outlet />

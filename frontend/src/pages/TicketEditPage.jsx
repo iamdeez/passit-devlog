@@ -192,7 +192,7 @@ const TicketEditPage = () => {
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-surface-container-lowest border-t border-outline-variant shadow-lg z-50">
+      <div className="fixed bottom-0 inset-x-0 mx-auto max-w-md bg-surface-container-lowest border-t border-outline-variant shadow-lg z-50">
         <div className="flex gap-3 px-4 h-24 items-center w-full max-w-md mx-auto">
           <button onClick={() => navigate("/mypage/my-tickets")} className="flex-1 h-14 rounded-xl border border-outline text-on-surface-variant font-bold hover:bg-surface-container-high transition-colors active:scale-95">
             임시저장

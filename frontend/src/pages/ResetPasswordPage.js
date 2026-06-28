@@ -7,7 +7,7 @@ const ResetPasswordPage = () => {
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
-      <header className="fixed top-0 w-full z-50 flex items-center px-4 h-16 bg-surface border-b border-outline-variant">
+      <header className="fixed top-0 inset-x-0 mx-auto w-full max-w-md z-50 flex items-center px-4 h-16 bg-surface border-b border-outline-variant">
         <button onClick={() => navigate("/auth")} className="p-2 hover:bg-surface-container-high transition-colors rounded-full active:scale-95">
           <span className="material-symbols-outlined text-on-surface">arrow_back</span>
         </button>

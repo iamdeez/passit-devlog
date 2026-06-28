@@ -152,7 +152,7 @@ export default function ProfilePage() {
 
   return (
     <div className="bg-background text-on-background min-h-screen pb-24 -mx-4 sm:-mx-6 md:mx-0">
-      <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-surface flex items-center justify-between px-4 h-16">
+      <header className="md:hidden fixed top-0 inset-x-0 mx-auto max-w-md z-50 bg-surface flex items-center justify-between px-4 h-16">
         <button
           type="button"
           onClick={() => setProfileDialogOpen(true)}

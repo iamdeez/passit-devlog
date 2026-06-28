@@ -143,7 +143,7 @@ export default function TicketCreatePage() {
 
   return (
     <form onSubmit={handleSubmit} className="bg-surface text-on-surface min-h-screen pb-32">
-      <nav className="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant">
+      <nav className="fixed top-0 inset-x-0 mx-auto w-full max-w-md z-50 bg-surface border-b border-outline-variant">
         <div className="flex items-center px-4 h-16 w-full max-w-md mx-auto">
           <button
             type="button"
@@ -339,7 +339,7 @@ export default function TicketCreatePage() {
         </section>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 bg-surface border-t border-outline-variant p-4 z-50">
+      <footer className="fixed bottom-0 inset-x-0 mx-auto max-w-md bg-surface border-t border-outline-variant p-4 z-50">
         <div className="max-w-md mx-auto">
           <button
             type="submit"

@@ -117,7 +117,7 @@ export default function NotificationPage() {
 
   return (
     <div className="bg-background text-on-background min-h-screen pb-20">
-      <nav className="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-4 h-16">
+      <nav className="fixed top-0 inset-x-0 mx-auto w-full max-w-md z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-4 h-16">
         <div className="flex items-center gap-3">
           <button
             type="button"

@@ -63,7 +63,7 @@ function PaymentResultPage() {
 
   return (
     <div className="bg-surface font-body text-on-surface antialiased overflow-x-hidden pb-24 min-h-screen">
-      <header className="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant">
+      <header className="fixed top-0 inset-x-0 mx-auto w-full max-w-md z-50 bg-surface border-b border-outline-variant">
         <div className="flex items-center justify-between px-4 h-16 w-full max-w-md mx-auto">
           <button onClick={() => navigate("/")} className="active:opacity-70 hover:bg-surface-container transition-colors rounded-full p-2">
             <span className="material-symbols-outlined text-on-surface">close</span>
@@ -149,7 +149,7 @@ function PaymentResultPage() {
         </div>
       </main>
 
-      <nav className="fixed bottom-0 w-full z-50 border-t border-outline-variant bg-surface shadow-lg">
+      <nav className="fixed bottom-0 inset-x-0 mx-auto w-full max-w-md z-50 border-t border-outline-variant bg-surface shadow-lg">
         <div className="flex justify-around items-center h-20 w-full max-w-md mx-auto">
           {NAV_ITEMS.map(([label, icon, path]) => {
             const active = label === "티켓";

@@ -46,7 +46,7 @@ export default function ReportListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
+    <div className="min-h-screen bg-background pb-16">
       <PageHeader
         icon="flag"
         title="신고 내역"

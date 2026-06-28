@@ -2,6 +2,10 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/admin/AdminLayout";
 import supabase from "../../config/supabaseClient";
+import { isDemoMode } from "../../demo/demoConfig";
+import { demoTickets, demoUsers, demoInquiries, demoReports } from "../../demo/demoData";
+
+const DEMO_CAT_NAME = ["", "뮤지컬", "연극", "콘서트", "스포츠", "전시", "클래식", "기타"];
 
 const relativeTime = (dateStr) => {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -80,6 +84,38 @@ const AdminDashboardPage = () => {
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
+
+    // 데모 모드: 백엔드/Supabase 없이 mock 데이터로 대시보드를 채운다.
+    if (isDemoMode()) {
+      const pendingInq = demoInquiries.filter((i) => i.status === "PENDING");
+      const pendingRep = demoReports.filter((r) => r.status === "PENDING");
+      setStats({
+        totalUsers: demoUsers.length,
+        todayUsers: 1,
+        totalTickets: demoTickets.length,
+        availTickets: demoTickets.filter((t) => t.ticketStatus === "AVAILABLE").length,
+        pendingInquiries: pendingInq.length,
+        pendingReports: pendingRep.length,
+      });
+      setPendingInquiries(pendingInq.slice(0, 5).map((i) => ({
+        id: i.id, title: i.title, created_at: i.createdAt, user: { nickname: i.userNickname, email: "" },
+      })));
+      setPendingReports(pendingRep.slice(0, 5).map((r) => ({
+        id: r.id, target_type: r.targetType, reason: r.reason, created_at: r.createdAt, reporter: { nickname: r.reporterNickname },
+      })));
+      setRecentTickets(demoTickets.slice(0, 5).map((t) => ({
+        ticket_id: t.ticketId, event_name: t.eventName, selling_price: t.sellingPrice,
+        ticket_status: t.ticketStatus, created_at: t.createdAt, image1: t.image1,
+        category: { name: DEMO_CAT_NAME[t.categoryId] || "기타" },
+      })));
+      setRecentUsers(demoUsers.slice(0, 5).map((u) => ({
+        id: u.id, nickname: u.nickname, email: u.email, created_at: u.createdAt,
+      })));
+      setLastUpdated(new Date());
+      setLoading(false);
+      return;
+    }
+
     try {
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const [

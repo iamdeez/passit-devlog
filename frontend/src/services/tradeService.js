@@ -1,4 +1,6 @@
 import supabase from "../config/supabaseClient";
+import { isDemoMode } from "../demo/demoConfig";
+import { demoDeals, demoUser, buildPage } from "../demo/demoData";
 
 const DEAL_SELECT = `
   *,
@@ -59,6 +61,10 @@ class TradeService {
   }
 
   async getDealDetail(dealId) {
+    if (isDemoMode()) {
+      const d = demoDeals.find((x) => String(x.dealId) === String(dealId));
+      return d ? { ...d } : null;
+    }
     const { data, error } = await supabase
       .from("deals")
       .select(DEAL_SELECT)
@@ -69,6 +75,13 @@ class TradeService {
   }
 
   async getMyDeals({ status, role } = {}) {
+    if (isDemoMode()) {
+      let list = demoDeals.slice();
+      if (role === "buyer") list = list.filter((d) => String(d.buyerId) === String(demoUser.userId));
+      else if (role === "seller") list = list.filter((d) => String(d.sellerId) === String(demoUser.userId));
+      if (status) list = list.filter((d) => d.status === status);
+      return { success: true, data: buildPage(list) };
+    }
     const { data: { user } } = await supabase.auth.getUser();
     let query = supabase.from("deals").select(DEAL_SELECT);
 

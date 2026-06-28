@@ -1,8 +1,15 @@
 import supabase from "../../config/supabaseClient";
+import { isDemoMode } from "../../demo/demoConfig";
+import { demoCsService } from "../../demo/demoCsService";
 
 // ── 유저 ──────────────────────────────────────────────────
 
 export const getMyInquiries = async () => {
+  if (isDemoMode()) {
+    const r = await demoCsService.getInquiries();
+    // InquiryListPage 는 res.data 를 배열로 읽는다.
+    return { data: r.data.content };
+  }
   const { data: { user } } = await supabase.auth.getUser();
   const { data, error } = await supabase
     .from("inquiries")

@@ -1,6 +1,13 @@
 import supabase from "../config/supabaseClient";
+import { isDemoMode } from "../demo/demoConfig";
+import { demoCsService } from "../demo/demoCsService";
 
 export const getNotices = async ({ page = 0, size = 20 } = {}) => {
+  if (isDemoMode()) {
+    const r = await demoCsService.getNotices({ page, size });
+    // NoticeListPage 는 res.data.data 를 배열로 읽는다.
+    return { data: { data: r.data.content } };
+  }
   const { data, error, count } = await supabase
     .from("notices")
     .select("*", { count: "exact" })

@@ -1,7 +1,11 @@
 import supabase from "../../config/supabaseClient";
+import { isDemoMode } from "../../demo/demoConfig";
+import { demoCategories } from "../../demo/demoData";
 
 export const categoryService = {
   async getAllCategories() {
+    if (isDemoMode()) return demoCategories;
+
     const { data, error } = await supabase
       .from("categories")
       .select("*")
@@ -28,6 +32,11 @@ export const categoryService = {
   },
 
   async createCategory({ name, icon, parentId = null }) {
+    if (isDemoMode()) {
+      const cat = { id: Date.now(), categoryId: Date.now(), name, icon: icon || "label", depth: parentId ? 1 : 0, parentId, parent_id: parentId, ticketCount: 0, children: [] };
+      demoCategories.push(cat);
+      return cat;
+    }
     const depth = parentId ? 1 : 0;
     const payload = { name, parent_id: parentId, depth };
     if (icon) payload.icon = icon;
@@ -41,6 +50,11 @@ export const categoryService = {
   },
 
   async updateCategory(id, { name, icon }) {
+    if (isDemoMode()) {
+      const c = demoCategories.find((x) => String(x.id) === String(id));
+      if (c) { c.name = name; if (icon) c.icon = icon; }
+      return c;
+    }
     const payload = { name };
     if (icon) payload.icon = icon;
     const { data, error } = await supabase
@@ -54,6 +68,11 @@ export const categoryService = {
   },
 
   async deleteCategory(id) {
+    if (isDemoMode()) {
+      const i = demoCategories.findIndex((x) => String(x.id) === String(id));
+      if (i >= 0) demoCategories.splice(i, 1);
+      return;
+    }
     const { error } = await supabase.from("categories").delete().eq("id", id);
     if (error) throw new Error(error.message);
   },

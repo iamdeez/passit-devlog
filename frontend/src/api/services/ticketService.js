@@ -1,4 +1,7 @@
 import supabase from "../../config/supabaseClient";
+import { isDemoMode } from "../../demo/demoConfig";
+import demoTicketService from "../../demo/demoTicketService";
+import { demoTickets, demoUser, buildPage } from "../../demo/demoData";
 
 const TICKET_SELECT = `
   *,
@@ -51,6 +54,10 @@ export const ticketService = {
     page = 0,
     size = 20,
   } = {}) {
+    if (isDemoMode()) {
+      return demoTicketService.getTickets({ keyword, eventName, categoryId, status, ticketStatus, sortBy, sortDirection, page, size });
+    }
+
     const effectiveStatus = ticketStatus || status || "AVAILABLE";
     const effectiveKeyword = eventName || keyword;
     const sortCol = SORT_COL[sortBy] || sortBy;
@@ -89,6 +96,10 @@ export const ticketService = {
   },
 
   async getTicketById(ticketId) {
+    if (isDemoMode()) {
+      const r = await demoTicketService.getTicketDetail(ticketId);
+      return r.success ? r.data : null;
+    }
     const { data, error } = await supabase
       .from("ticket")
       .select(TICKET_SELECT)
@@ -108,6 +119,10 @@ export const ticketService = {
   },
 
   async createTicket(ticketData) {
+    if (isDemoMode()) {
+      const r = await demoTicketService.createTicket(ticketData);
+      return r.data;
+    }
     const { data: { user } } = await supabase.auth.getUser();
     const { data, error } = await supabase
       .from("ticket")
@@ -119,6 +134,10 @@ export const ticketService = {
   },
 
   async updateTicket(ticketId, updates) {
+    if (isDemoMode()) {
+      const base = demoTickets.find((t) => String(t.ticketId) === String(ticketId)) || {};
+      return { ...base, ...updates };
+    }
     const { data: { user } } = await supabase.auth.getUser();
     const { data, error } = await supabase
       .from("ticket")
@@ -132,6 +151,7 @@ export const ticketService = {
   },
 
   async deleteTicket(ticketId) {
+    if (isDemoMode()) return;
     const { data: { user } } = await supabase.auth.getUser();
     const { error } = await supabase
       .from("ticket")
@@ -142,6 +162,13 @@ export const ticketService = {
   },
 
   async getMyTickets({ status, ticketStatus, page = 0, size = 20 } = {}) {
+    if (isDemoMode()) {
+      const want = ticketStatus || status;
+      const mine = demoTickets.filter(
+        (t) => String(t.ownerId) === String(demoUser.userId) && (!want || t.ticketStatus === want)
+      );
+      return { success: true, data: buildPage(mine, page, size) };
+    }
     const { data: { user } } = await supabase.auth.getUser();
     const effectiveStatus = ticketStatus || status;
     let query = supabase
@@ -168,6 +195,7 @@ export const ticketService = {
   },
 
   async uploadImage(file, ticketId) {
+    if (isDemoMode()) return "/images/concert.webp";
     const { data: { user } } = await supabase.auth.getUser();
     const ext = file.name.split(".").pop();
     const path = `${user.id}/${ticketId ?? "temp"}/${Date.now()}.${ext}`;
@@ -178,6 +206,7 @@ export const ticketService = {
   },
 
   async toggleFavorite(ticketId) {
+    if (isDemoMode()) return { success: true, data: true };
     const { data: { user } } = await supabase.auth.getUser();
     const { data: existing } = await supabase
       .from("favorites")
@@ -196,6 +225,7 @@ export const ticketService = {
   },
 
   async checkFavorite(ticketId) {
+    if (isDemoMode()) return { success: true, data: false };
     const { data: { user } } = await supabase.auth.getUser();
     const { data } = await supabase
       .from("favorites")
@@ -207,6 +237,7 @@ export const ticketService = {
   },
 
   async getMyFavorites() {
+    if (isDemoMode()) return demoTickets.slice(0, 4);
     const { data: { user } } = await supabase.auth.getUser();
     const { data, error } = await supabase
       .from("favorites")

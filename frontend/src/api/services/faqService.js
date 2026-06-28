@@ -1,6 +1,12 @@
 import supabase from "../../config/supabaseClient";
+import { isDemoMode } from "../../demo/demoConfig";
+import { demoCsService } from "../../demo/demoCsService";
 
 export const getFaqs = async () => {
+  if (isDemoMode()) {
+    const r = await demoCsService.getFaqs();
+    return r.data.content;
+  }
   const { data, error } = await supabase
     .from("faqs")
     .select("*")
